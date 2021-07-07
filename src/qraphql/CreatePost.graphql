@@ -1,0 +1,7 @@
+mutation {
+    createPost(description:${text}){
+        id
+        description
+        check
+    }
+}

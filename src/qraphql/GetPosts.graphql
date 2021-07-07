@@ -1,0 +1,7 @@
+query {
+    posts {
+        id
+        check
+        description
+    }
+}
