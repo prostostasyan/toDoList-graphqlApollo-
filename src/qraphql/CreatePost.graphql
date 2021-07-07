@@ -1,7 +1,9 @@
-mutation {
-    createPost(description:${text}){
-        id
-        description
-        check
-    }
-}
+ mutation CreatePosts($description: String!)
+ {
+     createPost(description: $description)
+     {
+         id
+         description
+         check
+     }
+ }

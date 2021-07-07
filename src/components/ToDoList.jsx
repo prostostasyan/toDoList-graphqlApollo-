@@ -1,18 +1,15 @@
-import React, {useEffect} from 'react';
-import {deleteData, postData, putData} from '../api/api';
-import {useSelector, useDispatch} from 'react-redux';
+import React, {useEffect, useState} from 'react';
 import Form from './Form';
 import ToDoItem from './ToDoItem';
 import styled from 'styled-components';
-import {
-    addItems,
-    setError,
-    getAsyncItems,
-    selectError,
-    setCheck,
-    selectItems,
-    deleteItem,
-} from './toDoListSlice';
+import {loader} from 'graphql.macro';
+import {useMutation, useQuery} from "@apollo/client";
+
+const GET_POSTS = loader('./../qraphql/GetPosts.graphql');
+const DELETE_POST = loader('./../qraphql/DeletePost.graphql');
+const UPDATE_POST = loader('./../qraphql/UpdatePost.graphql');
+const CREATE_POST = loader('./../qraphql/CreatePost.graphql');
+
 
 const ToDoListWrap = styled.div`
     margin-top: 30px;
@@ -38,67 +35,56 @@ const Ul = styled.ul`
     padding-top: 20px;
 `;
 
+
 function ToDoList() {
-    const items = useSelector(selectItems);
-    const error = useSelector(selectError);
-    const dispatch = useDispatch();
+    let {loading, error, data, refetch} = useQuery(GET_POSTS, {});
+    const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        dispatch(getAsyncItems());
-    }, []);
-
-    const addItem = async (text) => {
-        const response = await postData('posts', text);
-        if (!response.error) {
-            const data = response.data.data;
-            dispatch(setError(''));
-            dispatch(addItems(data));
-        } else {
-            const err = String(response.error);
-            dispatch(setError(err));
+        if (!loading) {
+            setPosts(data.posts)
         }
-    };
+    }, [data])
 
-    const checkedItem = async (id, state) => {
-        const response = await putData(
-            'posts',
-            id,
-            items.find((post) => post.id === id),
-            state
-        );
-        if (!response.error) {
-            dispatch(setError(''));
-            dispatch(setCheck(id));
-        } else {
-            const err = String(response.error);
-            dispatch(setError(err));
-        }
-    };
 
-    const deletePost = async (key) => {
-        const response = await deleteData('posts', key);
-        if (!response.error) {
-            dispatch(setError(''));
-            dispatch(deleteItem(key));
-        } else {
-            const err = String(response.error);
-            dispatch(setError(err));
-        }
-    };
+    const [addItem] = useMutation(CREATE_POST);
+    const [deletePost] = useMutation(DELETE_POST);
+    const [checkedItem] = useMutation(UPDATE_POST);
+
+    const addPost = (value) => {
+        addItem({variables: {description: value}})
+            .then(({data}) => {
+                    setPosts([...posts, data.createPost])
+                }
+            )
+    }
+    const onDelete = (id) => {
+        deletePost({variables: {id: +id}})
+            .then(() => {
+                    let newPosts = posts.filter(elem => +elem.id !== +id);
+                    setPosts(newPosts)
+                }
+            )
+    }
+
+    if (loading) return <h2> Loading... </h2>;
+    if (error) return <Error> ERROR...: {error} </Error>;
+
     return (
         <ToDoListWrap>
-            <Form onSubmit={addItem} />
-            {error !== '' && <Error>{error}</Error>}
-
+            <Form
+                onSubmit={addPost}
+                update={refetch}/>
             <Ul>
-                {items.map((item) => (
+                {!loading && posts.map((item) => (
                     <ToDoItem
-                        done={item.done}
-                        key={item.id}
-                        id={item.id}
-                        text={item.text}
+                        update={refetch}
+                        done={item.check}
+                        key={+item.id}
+                        id={+item.id}
+                        text={item.description}
                         checkPost={checkedItem}
-                        onDelete={deletePost}
+                        onDelete={onDelete}
                     />
                 ))}
             </Ul>

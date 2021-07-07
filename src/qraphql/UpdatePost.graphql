@@ -1,0 +1,7 @@
+mutation UpdatePost($id: ID!, $check: Boolean!, $description: String) {
+    updatePost(id: $id, check: $check, description: $description) {
+        id
+        description
+        check
+    }
+}

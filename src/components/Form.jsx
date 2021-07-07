@@ -20,7 +20,7 @@ const Button = styled.button`
     padding: 10px;
     font-size: 16px;
     background-color: #0066ff;
-    color: #fff;
+    color: #ffffff;
     border: 2px solid #0066ff;
     :hover {
         background-color: #003399;
@@ -32,7 +32,7 @@ const Button = styled.button`
     }
 `;
 
-const Form = ({onSubmit}) => {
+const Form = ({onSubmit,update}) => {
     const [value, setValue] = useState('');
     const handleChange = (elem) => {
         setValue(elem.target.value);
@@ -42,6 +42,8 @@ const Form = ({onSubmit}) => {
         if (value !== '') {
             onSubmit(value);
             setValue('');
+            // update()
+
         }
     };
 

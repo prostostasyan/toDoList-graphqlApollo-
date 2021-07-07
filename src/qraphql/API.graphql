@@ -1,26 +1,26 @@
-#query GetPosts{
-#    posts {
-#        id
-#        check
-#        description
-#    }
-#}
-#
-#mutation CreatePosts{
-#    createPost(description:${text}){
-#        id
-#        description
-#        check
-#    }
-#}
-#
-#mutation UpdatePosts{
-#    updatePost ( id: ${selectedId} description: ${text}){
-#        id
-#        description
-#        check
-#    }
-#}
+query GetPosts{
+    posts {
+        id
+        check
+        description
+    }
+}
+
+mutation CreatePosts{
+    createPost(description:${text}){
+        id
+        description
+        check
+    }
+}
+
+mutation UpdatePosts{
+    updatePost ( id: ${selectedId} description: ${text}){
+        id
+        description
+        check
+    }
+}
 
 mutation DeletePost {
     deletePost (id:${selectedId}){

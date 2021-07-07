@@ -40,11 +40,15 @@ const Del = styled.button`
     }
 `;
 
-const ToDoItem = ({onDelete, checkPost, text, id, done}) => (
+const ToDoItem = ({onDelete, checkPost, text, id, done,update}) => (
     <Li done={done}>
-        <Check checked={done} onChange={() => checkPost(id, !done)} />
+        <Check checked={done} onChange={
+            () => {checkPost({ variables: { id: +id, check: !done}});
+            }} />
         {text}
-        <Del onClick={() => onDelete(id)}> x </Del>
+        <Del onClick={(elem) =>{
+            onDelete(id)
+        } }> x </Del>
     </Li>
 );
 
